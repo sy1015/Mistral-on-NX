@@ -6,6 +6,22 @@ This repository contains a demo application that runs [MAAL](https://huggingface
 ### Software
  * [NVIDIA JetPack SDK](https://developer.nvidia.com/embedded/jetpack) >= 5.1.2
    * To install, `sudo apt install nvidia-jetpack`
+ * [NVIDIA container runtime](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+   * make sure that it is a default runtime
+
+```
+# Edit /etc/docker/daemon.json
+{
+    "runtimes": {
+        "nvidia": {
+            "args": [],
+            "path": "nvidia-container-runtime"
+        }
+    },
+    "default-runtime": "nvidia"
+}
+# Run `sudo systemctl restart docker` after editing the file
+```
 ### Hardware
 #### Tested
  * Jetson AGX Orin 64GB module
@@ -30,9 +46,8 @@ sudo docker build -f Dockerfile -t maal-on-jetson .
 Exec into the container
 
 ```
-sudo docker run -it --rm --runtime nvidia --network host -v ~/MAAL-on-Jetson/:/MAAL-on-Jetson maal-on-jetson
+sudo docker run -it --rm --runtime nvidia --network host maal-on-jetson
 ```
- * It is important to specify `--runtime nvidia` for the container to detect the NVIDIA hardware.
 
 **Inside the container,** run the python application
 ```
@@ -47,14 +62,26 @@ sudo docker build -f Dockerfile.mlc -t maal-on-jetson-mlc .
 
 Exec into the container
 ```
-sudo docker run --runtime nvidia -it --rm --network host -v ~/MAAL-on-Jetson/:/MAAL-on-Jetson maal-on-jetson-mlc
+sudo docker run --runtime nvidia -it --rm --network host maal-on-jetson-mlc
 ```
- * It is important to specify `--runtime nvidia` for the container to detect the NVIDIA hardware.
 
 Inside the container, run the python application
 ```
 # Inside the container
 python3 mlc.py
+```
+
+### Deploying REST server using MLC
+Inside the container, run REST server
+```
+# Inside the container
+python3 -m mlc_chat.rest --model dist/Llama-3-MAAL-8B-Instruct-v0.1-q4f32-MLC/ --lib-path dist/libs/Llama-3-MAAL-8B-Instruct-v0.1-q4f32-cuda.so --device cuda
+```
+
+Test with a sample client. 
+```
+# On a separate terminal, run
+python3 client.py
 ```
 
 
