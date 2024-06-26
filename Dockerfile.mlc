@@ -1,0 +1,19 @@
+FROM dustynv/mlc:51fb0f4-builder-r35.4.1
+
+RUN apt update && apt install -y vim git-lfs
+
+# RUN git lfs install && \
+RUN git clone https://huggingface.co/maum-ai/Llama-3-MAAL-8B-Instruct-v0.1
+
+RUN mkdir -p dist/libs
+
+# Convert weight
+RUN mlc_chat convert_weight Llama-3-MAAL-8B-Instruct-v0.1/ --quantization q4f16_1 -o dist/Llama-3-MAAL-8B-Instruct-v0.1-q4f16-MLC
+
+# 1. gen_config: generate mlc-chat-config.json and process tokenizers
+RUN mlc_chat gen_config Llama-3-MAAL-8B-Instruct-v0.1/ --quantization q4f16_1 --conv-template llama_default -o dist/Llama-3-MAAL-8B-Instruct-v0.1-q4f16-MLC/
+
+# 2. compile: compile model library with specification in mlc-chat-config.json
+RUN mlc_chat compile dist/Llama-3-MAAL-8B-Instruct-v0.1-q4f16-MLC/mlc-chat-config.json --device cuda -o dist/libs/Llama-3-MAAL-8B-Instruct-v0.1-q4f16-cuda.so
+
+RUN python3 mlc.py

@@ -22,21 +22,39 @@ git clone https://github.com/phgcha/MAAL-on-Jetson.git
 cd MAAL-on-Jetson
 ```
 
+### Using HF transformers
 Build the docker image that contains dependency
 ```
-sudo docker build -t maal-on-jetson ./
+sudo docker build -f Dockerfile -t maal-on-jetson .
+```
+Exec into the container
+
+```
+sudo docker run -it --rm --runtime nvidia --network host -v ~/MAAL-on-Jetson/:/MAAL-on-Jetson maal-on-jetson
+```
+ * It is important to specify `--runtime nvidia` for the container to detect the NVIDIA hardware.
+
+**Inside the container,** run the python application
+```
+python3 main.py
+```
+
+### Using MLC
+Build the docker image that contains dependency
+```
+sudo docker build -f Dockerfile.mlc -t maal-on-jetson-mlc .
 ```
 
 Exec into the container
 ```
-sudo docker run -it --rm --runtime nvidia --network host maal-on-jetson
+sudo docker run --runtime nvidia -it --rm --network host -v ~/MAAL-on-Jetson/:/MAAL-on-Jetson maal-on-jetson-mlc
 ```
  * It is important to specify `--runtime nvidia` for the container to detect the NVIDIA hardware.
 
 Inside the container, run the python application
 ```
 # Inside the container
-python3 main.py
+python3 mlc.py
 ```
 
 
