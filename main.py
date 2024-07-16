@@ -2,7 +2,8 @@ import transformers
 from time import time 
 
 
-model_id = "maum-ai/Llama-3-MAAL-8B-Instruct-v0.1"
+# model_id = "maum-ai/Llama-3-MAAL-8B-Instruct-v0.1"
+model_id = "mistralai/Mistral-7B-v0.1"
 model = transformers.AutoModelForCausalLM.from_pretrained(model_id).to("cuda")
 tokenizer = transformers.AutoTokenizer.from_pretrained(model_id)
 streamer = transformers.TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
